@@ -18,7 +18,7 @@ local function animateButton(button: GuiButton)
         ScaleSpring.Speed = 300
 
         local Spring_Connection = RunService.RenderStepped:Connect(function(deltaTime)
-            UIScale.Scale = ScaleSpring:Update(deltaTime)            
+            UIScale.Scale = math.clamp(ScaleSpring:Update(deltaTime),1.0,1.23)            
         end)
 
         button.MouseEnter:Connect(function()
