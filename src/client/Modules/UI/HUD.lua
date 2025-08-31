@@ -34,11 +34,13 @@ for _, v in PlayerUI:GetDescendants() do
 		local isGamepass = v:HasTag("Gamepass")
 		local isProduct = v:HasTag("Product")
 
-		if isGamepass then
-			MarketPlaceService:PromptGamePassPurchase(Player, Market.Gamepasses[v.Name])
-		elseif isProduct then
-			MarketPlaceService:PromptProductPurchase(Player, Market.Products[v.Name])
-		end
+		v.Activated:Connect(function()
+			if isGamepass then
+				MarketPlaceService:PromptGamePassPurchase(Player, Market.Gamepasses[v.Name])
+			elseif isProduct then
+				MarketPlaceService:PromptProductPurchase(Player, Market.Products[v.Name])
+			end
+		end)
 	end
 end
 
@@ -130,11 +132,48 @@ RunService.RenderStepped:Connect(function(deltaTime)
 	Phase.TextLabel.Text = if StateValue.Value == "Not Enough Players"
 		then `{StateValue.Value}`
 		else `{StateValue.Value} ({TimeValue.Value})`
-	CurrentRound.TextLabel.Text = `Round {RoundValue.Value}/4`
+	CurrentRound.TextLabel.Text = `Round {RoundValue.Value}/6`
+
 	if StateValue.Value == "Intermission" or StateValue.Value == "Not Enough Players" then
 		switchMode(2)
+		for _, btn in HUD.right:GetChildren() do
+			if btn:IsA("ImageButton") then
+				btn:SetAttribute("Disabled", true)
+			end
+		end
 	else
 		switchMode(1)
+		for _, btn in HUD.right:GetChildren() do
+			if btn:IsA("ImageButton") then
+				btn:SetAttribute("Disabled", nil)
+			end
+		end
+
+		if ReplicatedStorage.GameSettings.TrapsDisabled.Value == true then
+			HUD.right.AddTrap:SetAttribute("Disabled", true)
+		else
+			if RoundValue.Value == 3 then
+				HUD.right.AddTrap:SetAttribute("Disabled", nil)
+			else
+				HUD.right.AddTrap:SetAttribute("Disabled", true)
+			end
+		end
+
+		if ReplicatedStorage.GameSettings.HideVotesDisabled.Value == true then
+			HUD.right.HideVotes:SetAttribute("Disabled", true)
+		else
+			if RoundValue.Value == 2 or RoundValue.Value == 3 then
+				HUD.right.HideVotes:SetAttribute("Disabled", nil)
+			else
+				HUD.right.HideVotes:SetAttribute("Disabled", true)
+			end
+		end
+
+		if RoundValue.Value == 3 then
+			HUD.right.Reveal:SetAttribute("Disabled", nil)
+		else
+			HUD.right.Reveal:SetAttribute("Disabled", true)
+		end
 	end
 end)
 

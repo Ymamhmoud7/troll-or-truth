@@ -8,47 +8,54 @@ local Player = Players.LocalPlayer
 local PlayerUI = Player.PlayerGui
 
 local function animateButton(button: GuiButton)
-    if button:IsA("GuiButton") then
-        
-        local UIScale = button:FindFirstChildOfClass("UIScale") or Instance.new("UIScale")
-        UIScale.Parent = button
-        UIScale.Scale = 1
+	if button:IsA("GuiButton") then
+		local UIScale = button:FindFirstChildOfClass("UIScale") or Instance.new("UIScale")
+		UIScale.Parent = button
+		UIScale.Scale = 1
 
-        local ScaleSpring = Spring.new(1)
-        ScaleSpring.Speed = 300
+		local ScaleSpring = Spring.new(1)
+		ScaleSpring.Speed = 300
 
-        local Spring_Connection = RunService.RenderStepped:Connect(function(deltaTime)
-            UIScale.Scale = math.clamp(ScaleSpring:Update(deltaTime),1.0,1.23)            
-        end)
+		local Spring_Connection = RunService.RenderStepped:Connect(function(deltaTime)
+			if button:GetAttribute("Disabled") then
+				button.Visible = false
+				return
+			else
+				if button.Visible == false then
+					button.Visible = true
+				end
+			end
+			UIScale.Scale = math.clamp(ScaleSpring:Update(deltaTime), 1.0, 1.23)
+		end)
 
-        button.MouseEnter:Connect(function()
-            ScaleSpring.Target = 1.1
-        end)
-    
-        button.MouseLeave:Connect(function()
-            ScaleSpring.Target = 1.0
-        end)
+		button.MouseEnter:Connect(function()
+			ScaleSpring.Target = 1.1
+		end)
 
-        button.MouseButton1Down:Connect(function()
-            ScaleSpring.Target = 1.2
-        end)
+		button.MouseLeave:Connect(function()
+			ScaleSpring.Target = 1.0
+		end)
 
-        button.MouseButton1Up:Connect(function()
-            ScaleSpring.Target = 1.1
-        end)
+		button.MouseButton1Down:Connect(function()
+			ScaleSpring.Target = 1.2
+		end)
 
-        button.Destroying:Connect(function()
-            Spring_Connection:Disconnect()
-        end)
-    end
+		button.MouseButton1Up:Connect(function()
+			ScaleSpring.Target = 1.1
+		end)
+
+		button.Destroying:Connect(function()
+			Spring_Connection:Disconnect()
+		end)
+	end
 end
 
 for _, v in PlayerUI:GetDescendants() do
-    animateButton(v)
+	animateButton(v)
 end
 
 PlayerUI.DescendantAdded:Connect(function(descendant)
-    animateButton(descendant)
+	animateButton(descendant)
 end)
 
 return {}

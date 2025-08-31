@@ -27,10 +27,30 @@ Remotes.Message.OnClientEvent:Connect(function(trap: string)
 			v.BillboardGui.Enabled = false
 		end
 	end
-	local trapInst = workspace.Slots.SpawnPoints:FindFirstChild(trap)
-	if trapInst then
-		trapInst.BillboardGui.Enabled = true
-		trapInst.BillboardGui.TextLabel.Text = "⬇️"
+	if trap then
+		for _, x in trap do
+			local trapInst = workspace.Slots.SpawnPoints:FindFirstChild(x)
+			if trapInst then
+				trapInst.BillboardGui.Enabled = true
+				trapInst.BillboardGui.TextLabel.Text = "⬇️"
+			end
+		end
+	end
+end)
+
+Remotes.Hints.OnClientEvent:Connect(function(enabled: boolean, trap: number?)
+	print(enabled, trap)
+	if enabled == true then
+		local trapInst = workspace.Slots.SpawnPoints:FindFirstChild(trap)
+		local highlight = Instance.new("Highlight")
+		highlight.Parent = trapInst
+		highlight.FillTransparency = 1
+	else
+		for _, v: Highlight in workspace.Slots.SpawnPoints:GetDescendants() do
+			if v:IsA("Highlight") then
+				v:Destroy()
+			end
+		end
 	end
 end)
 
